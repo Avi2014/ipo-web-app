@@ -1,0 +1,52 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.test
+.env.production
+#json files
+*.json
+!*.jsonc
+#tailwind
+tailwind.config.js
+tailwind.config.cjs 
+tailwind.config.mjs
+#postcss
+postcss.config.js
+postcss.config.cjs
+postcss.config.mjs
+# vite
+vite.config.js
+vite.config.cjs
+vite.config.mjs
+#es
+.eslintrc.js
+.eslintrc.cjs
+.eslintrc.mjs
