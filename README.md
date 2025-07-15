@@ -1,4 +1,4 @@
-# IPO Portal - MERN Stack Application
+# IPO Web App
 
 A comprehensive IPO (Initial Public Offering) management platform built with the MERN stack for production-level deployment.
 
@@ -117,24 +117,6 @@ ipo/
    ```
    Client will run on http://localhost:3000
 
-## 🔧 Configuration
-
-### Environment Variables
-
-#### Client (.env.development)
-```env
-VITE_API_URL=http://localhost:5000/api
-VITE_APP_NAME=IPO Portal
-```
-
-#### Server (.env)
-```env
-NODE_ENV=development
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/ipo_portal
-JWT_SECRET=your-secret-key
-```
-
 ## 📊 Features (Planned Components)
 
 1. **Authentication System**
@@ -208,7 +190,7 @@ This project is licensed under the MIT License.
 
 ## 📞 Support
 
-For support and questions, please contact [your-email@example.com]
+For support and questions, please contact [avinashranjan2074@gmail.com]
 
 ---
 
