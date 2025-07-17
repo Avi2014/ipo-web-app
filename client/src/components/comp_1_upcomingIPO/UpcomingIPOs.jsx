@@ -5,7 +5,7 @@ import SearchAndFilters from "./SearchAndFilters";
 import IPODetailsModal from "./IPODetailsModal";
 import { upcomingIPOs } from "./data/ipoData";
 
-const UpcomingIPOs = () => {
+const   UpcomingIPOs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     sector: "All Sectors",

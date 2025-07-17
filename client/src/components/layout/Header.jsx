@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -85,19 +86,24 @@ const Header = () => {
                 NEW
               </span>
             </a>
+            {/* ADMIN tab removed as requested */}
           </nav>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              className="text-gray-700 hover:text-blue-600"
-            >
-              Sign In
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2">
-              Sign Up Now
-            </Button>
+            <Link to="/signin">
+              <Button
+                variant="ghost"
+                className="text-gray-700 hover:text-blue-600"
+              >
+                Sign In
+              </Button>
+            </Link>
+            <Link to="signup">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2">
+                Sign Up Now
+              </Button>
+            </Link>
             {/* Menu Grid Icon */}
             <div className="grid grid-cols-3 gap-1 p-2 cursor-pointer hover:bg-gray-100 rounded">
               {[...Array(9)].map((_, i) => (
