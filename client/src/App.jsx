@@ -9,6 +9,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import AdminPage from "./pages/AdminPage";
 import { SignIn, SignUp } from "./components/comp_2_admin_side";
+import BrokerComp from "./pages/BrokerComp";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/compare-broker" element={<BrokerComp />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

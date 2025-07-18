@@ -1,4 +1,5 @@
 import { X, Facebook, Youtube, Linkedin, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -105,12 +106,12 @@ const Footer = () => {
             <h4 className="font-semibold text-gray-900 mb-4">Offerings</h4>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/compare-broker"
                   className="text-gray-600 hover:text-blue-600 transition-colors"
                 >
                   Compare Broker
-                </a>
+                </Link>
               </li>
               <li>
                 <a
