@@ -130,12 +130,12 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/all-brokers"
                   className="text-gray-600 hover:text-blue-600 transition-colors"
                 >
                   All Brokers
-                </a>
+                </Link>
               </li>
               <li>
                 <a
@@ -153,12 +153,12 @@ const Footer = () => {
             <h4 className="font-semibold text-gray-900 mb-4">Links</h4>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/all-sharks"
                   className="text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Shark Investor
-                </a>
+                  Shark Investors
+                </Link>
               </li>
               <li>
                 <a

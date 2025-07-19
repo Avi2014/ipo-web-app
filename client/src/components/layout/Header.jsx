@@ -79,12 +79,12 @@ const Header = () => {
               {/* Dropdown Menu */}
               <div className="absolute left-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="py-1">
-                  <a
-                    href="#"
+                  <Link
+                    to="/all-brokers"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
                   >
                     All Brokers
-                  </a>
+                  </Link>
                   <Link
                     to="/compare-broker"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
@@ -169,12 +169,12 @@ const Header = () => {
               {/* Brokers Section in Mobile */}
               <div className="text-gray-700 font-medium">BROKERS</div>
               <div className="pl-4 space-y-2">
-                <a
-                  href="#"
+                <Link
+                  to="/all-brokers"
                   className="block text-gray-600 hover:text-blue-600 font-medium"
                 >
                   All Brokers
-                </a>
+                </Link>
                 <Link
                   to="/compare-broker"
                   className="block text-gray-600 hover:text-blue-600 font-medium"
