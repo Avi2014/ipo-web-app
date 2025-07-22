@@ -94,6 +94,54 @@ const Header = () => {
                 </div>
               </div>
             </div>
+            <div className="relative group">
+              <a
+                href="#"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center"
+              >
+                TRADING
+                <svg
+                  className="ml-1 w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </a>
+              {/* Trading Dropdown Menu */}
+              <div className="absolute left-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-1">
+                  <Link
+                    to="/user-signin"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                  >
+                    Login to Trade
+                  </Link>
+                  <Link
+                    to="/trading-dashboard"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                  >
+                    Trading Dashboard
+                  </Link>
+                  <Link
+                    to="/market-overview"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                  >
+                    Market Overview
+                  </Link>
+                  <Link
+                    to="/account-settings"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                  >
+                    Account Settings
+                  </Link>
+                </div>
+              </div>
+            </div>
             <a
               href="#"
               className="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center"
@@ -108,7 +156,7 @@ const Header = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link to="/signin">
+            <Link to="/user-signin">
               <Button
                 variant="ghost"
                 className="text-gray-700 hover:text-blue-600"
@@ -116,7 +164,7 @@ const Header = () => {
                 Sign In
               </Button>
             </Link>
-            <Link to="signup">
+            <Link to="/user-signup">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2">
                 Sign Up Now
               </Button>
@@ -182,6 +230,34 @@ const Header = () => {
                   Compare Broker
                 </Link>
               </div>
+              {/* Trading Section in Mobile */}
+              <div className="text-gray-700 font-medium">TRADING</div>
+              <div className="pl-4 space-y-2">
+                <Link
+                  to="/user-signin"
+                  className="block text-gray-600 hover:text-blue-600 font-medium"
+                >
+                  Login to Trade
+                </Link>
+                <Link
+                  to="/trading-dashboard"
+                  className="block text-gray-600 hover:text-blue-600 font-medium"
+                >
+                  Trading Dashboard
+                </Link>
+                <Link
+                  to="/market-overview"
+                  className="block text-gray-600 hover:text-blue-600 font-medium"
+                >
+                  Market Overview
+                </Link>
+                <Link
+                  to="/account-settings"
+                  className="block text-gray-600 hover:text-blue-600 font-medium"
+                >
+                  Account Settings
+                </Link>
+              </div>
               <a
                 href="#"
                 className="text-gray-700 hover:text-blue-600 font-medium"
@@ -189,12 +265,12 @@ const Header = () => {
                 LIVE NEWS
               </a>
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
-                <Link to="/signin">
+                <Link to="/user-signin">
                   <Button variant="outline" className="w-full">
                     Sign In
                   </Button>
                 </Link>
-                <Link to="/signup">
+                <Link to="/user-signup">
                   <Button className="w-full bg-blue-600 hover:bg-blue-700">
                     Sign Up Now
                   </Button>

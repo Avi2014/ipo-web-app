@@ -11,6 +11,13 @@ import AdminPage from "./pages/AdminPage";
 import { SignIn, SignUp } from "./components/comp_2_admin_side";
 import BrokerComp from "./pages/BrokerComp";
 import { AllBrokers, AllSharks } from "./components/comp_4_allbrokers";
+import {
+  UserSignup,
+  UserSignin,
+  TradingDashboard,
+  MarketOverview,
+  AccountSettings,
+} from "./components/comp_5_userlogin&dashboard";
 
 function App() {
   return (
@@ -25,6 +32,14 @@ function App() {
             <Route path="/compare-broker" element={<BrokerComp />} />
             <Route path="/all-brokers" element={<AllBrokers />} />
             <Route path="/all-sharks" element={<AllSharks />} />
+
+            {/* Component 5: Customer Trading Platform Routes */}
+            <Route path="/user-signup" element={<UserSignup />} />
+            <Route path="/user-signin" element={<UserSignin />} />
+            <Route path="/trading-dashboard" element={<TradingDashboard />} />
+            <Route path="/market-overview" element={<MarketOverview />} />
+            <Route path="/account-settings" element={<AccountSettings />} />
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
