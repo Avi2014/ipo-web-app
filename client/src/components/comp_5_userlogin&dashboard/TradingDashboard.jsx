@@ -249,13 +249,15 @@ const TradingDashboard = () => {
           <div className="w-80 bg-gray-800 border-l border-gray-700 p-6">
             {/* Tab Navigation */}
             <div className="flex border-b border-gray-700 mb-6">
-              <button className="px-4 py-2 text-blue-400 border-b-2 border-blue-400">
+              <button className="px-3 py-2 text-blue-400 border-b-2 border-blue-400 text-sm">
                 Trade
               </button>
-              <button className="px-4 py-2 text-gray-400">Chart</button>
-              <button className="px-4 py-2 text-gray-400">Options</button>
-              <button className="px-4 py-2 text-gray-400">News</button>
-              <button className="px-4 py-2 text-gray-400">Financials</button>
+              <button className="px-3 py-2 text-gray-400 text-sm">Chart</button>
+              <button className="px-3 py-2 text-gray-400 text-sm">
+                Options
+              </button>
+              <button className="px-3 py-2 text-gray-400 text-sm">News</button>
+              {/* <button className="px-3 py-2 text-gray-400 text-sm">Data</button> */}
             </div>
 
             {/* Buy/Sell Buttons */}
@@ -299,7 +301,7 @@ const TradingDashboard = () => {
                     className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
                   />
                   <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                    <span className="text-xs text-gray-400">460.00</span>
+                    {/* <span className="text-xs text-gray-400">460.00</span> */}
                   </div>
                 </div>
 

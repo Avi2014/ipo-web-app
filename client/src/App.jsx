@@ -8,6 +8,7 @@ import {
 import { AuthProvider } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import AdminPage from "./pages/AdminPage";
+import Blogs from "./pages/Blogs";
 import { SignIn, SignUp } from "./components/comp_2_admin_side";
 import BrokerComp from "./pages/BrokerComp";
 import { AllBrokers, AllSharks } from "./components/comp_4_allbrokers";
@@ -27,6 +28,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/blogs" element={<Blogs />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/compare-broker" element={<BrokerComp />} />
