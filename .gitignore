@@ -50,3 +50,6 @@ vite.config.mjs
 .eslintrc.js
 .eslintrc.cjs
 .eslintrc.mjs
+
+.txt
+*.txt
