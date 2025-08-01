@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Mail, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import { useAuth } from "../../../hooks/useAuth";
 
 const ForgotPassword = ({ onBackToSignIn }) => {
+  const { forgotPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -13,13 +15,13 @@ const ForgotPassword = ({ onBackToSignIn }) => {
     setError("");
 
     try {
-      // Simulate API call for password reset
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock successful response
+      await forgotPassword(email);
       setIsEmailSent(true);
-    } catch {
-      setError("Failed to send reset email. Please try again.");
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      setError(
+        error.message || "Failed to send reset email. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -27,11 +29,13 @@ const ForgotPassword = ({ onBackToSignIn }) => {
 
   const handleResendEmail = async () => {
     setIsLoading(true);
+    setError("");
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await forgotPassword(email);
       // Show success message or update UI
-    } catch {
-      setError("Failed to resend email. Please try again.");
+    } catch (error) {
+      console.error("Resend email error:", error);
+      setError(error.message || "Failed to resend email. Please try again.");
     } finally {
       setIsLoading(false);
     }

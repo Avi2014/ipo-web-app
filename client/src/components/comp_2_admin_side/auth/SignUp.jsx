@@ -16,10 +16,12 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [formData, setFormData] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
-    organization: "",
+    dateOfBirth: "",
+    panNumber: "",
     password: "",
     confirmPassword: "",
   });
@@ -45,8 +47,12 @@ const SignUp = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "First name is required";
+    }
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "Last name is required";
     }
 
     if (!formData.email.trim()) {
@@ -61,8 +67,16 @@ const SignUp = () => {
       newErrors.phone = "Phone number is invalid";
     }
 
-    if (!formData.organization.trim()) {
-      newErrors.organization = "Organization is required";
+    if (!formData.dateOfBirth) {
+      newErrors.dateOfBirth = "Date of birth is required";
+    }
+
+    if (!formData.panNumber.trim()) {
+      newErrors.panNumber = "PAN number is required";
+    } else if (
+      !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.panNumber.toUpperCase())
+    ) {
+      newErrors.panNumber = "PAN number format is invalid";
     }
 
     if (!formData.password) {
@@ -90,18 +104,44 @@ const SignUp = () => {
 
     try {
       await register({
-        name: formData.fullName,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
-        organization: formData.organization,
+        dateOfBirth: formData.dateOfBirth,
+        panNumber: formData.panNumber.toUpperCase(),
         password: formData.password,
         role: "admin",
+        // Required fields for backend
+        address: {
+          street: "Admin Address",
+          city: "Admin City",
+          state: "Admin State",
+          pincode: "123456",
+          country: "India",
+        },
+        bankDetails: {
+          accountNumber: "1234567890",
+          ifscCode: "ABCD0123456",
+          bankName: "Admin Bank",
+        },
       });
       // Redirect to admin dashboard after successful registration
-      navigate("/admin");
+      navigate("/admin/dashboard");
     } catch (error) {
       console.error("Registration failed:", error);
-      setErrors({ general: "Registration failed. Please try again." });
+
+      let errorMessage = "Registration failed. Please try again.";
+
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (error.code === "EMAIL_EXISTS") {
+        errorMessage = "An account with this email already exists.";
+      } else if (error.code === "VALIDATION_ERROR") {
+        errorMessage = "Please check your input and try again.";
+      }
+
+      setErrors({ general: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -132,13 +172,13 @@ const SignUp = () => {
             </div>
           )}
 
-          {/* Full Name */}
+          {/* First Name */}
           <div>
             <label
-              htmlFor="fullName"
+              htmlFor="firstName"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Full Name
+              First Name
             </label>
             <div className="relative">
               <User
@@ -147,19 +187,50 @@ const SignUp = () => {
               />
               <input
                 type="text"
-                id="fullName"
-                name="fullName"
-                value={formData.fullName}
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
                 onChange={handleChange}
                 className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.fullName ? "border-red-300" : "border-gray-300"
+                  errors.firstName ? "border-red-300" : "border-gray-300"
                 }`}
-                placeholder="Enter your full name"
+                placeholder="Enter your first name"
                 required
               />
             </div>
-            {errors.fullName && (
-              <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+            {errors.firstName && (
+              <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+            )}
+          </div>
+
+          {/* Last Name */}
+          <div>
+            <label
+              htmlFor="lastName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Last Name
+            </label>
+            <div className="relative">
+              <User
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  errors.lastName ? "border-red-300" : "border-gray-300"
+                }`}
+                placeholder="Enter your last name"
+                required
+              />
+            </div>
+            {errors.lastName && (
+              <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
             )}
           </div>
 
@@ -225,13 +296,39 @@ const SignUp = () => {
             )}
           </div>
 
-          {/* Organization */}
+          {/* Date of Birth */}
           <div>
             <label
-              htmlFor="organization"
+              htmlFor="dateOfBirth"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Organization
+              Date of Birth
+            </label>
+            <div className="relative">
+              <input
+                type="date"
+                id="dateOfBirth"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  errors.dateOfBirth ? "border-red-300" : "border-gray-300"
+                }`}
+                required
+              />
+            </div>
+            {errors.dateOfBirth && (
+              <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</p>
+            )}
+          </div>
+
+          {/* PAN Number */}
+          <div>
+            <label
+              htmlFor="panNumber"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              PAN Number
             </label>
             <div className="relative">
               <Building
@@ -240,19 +337,21 @@ const SignUp = () => {
               />
               <input
                 type="text"
-                id="organization"
-                name="organization"
-                value={formData.organization}
+                id="panNumber"
+                name="panNumber"
+                value={formData.panNumber}
                 onChange={handleChange}
                 className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.organization ? "border-red-300" : "border-gray-300"
+                  errors.panNumber ? "border-red-300" : "border-gray-300"
                 }`}
-                placeholder="Enter your organization"
+                placeholder="Enter your PAN number (e.g., ABCDE1234F)"
+                style={{ textTransform: "uppercase" }}
+                maxLength={10}
                 required
               />
             </div>
-            {errors.organization && (
-              <p className="text-red-500 text-sm mt-1">{errors.organization}</p>
+            {errors.panNumber && (
+              <p className="text-red-500 text-sm mt-1">{errors.panNumber}</p>
             )}
           </div>
 

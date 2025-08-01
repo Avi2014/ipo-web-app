@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const UserSignup = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,11 @@ const UserSignup = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -19,12 +25,30 @@ const UserSignup = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    // Clear error when user starts typing
+    if (error) setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("User signup:", formData);
-    // Handle user signup logic here
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await register({
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        password: formData.password,
+        role: "user", // Ensure user role, not admin
+      });
+
+      // Redirect to user signin
+      navigate("/user-signin");
+    } catch (error) {
+      console.error("Registration error:", error);
+      setError(error.message || "Registration failed. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   const handleSocialLogin = (provider) => {
@@ -263,12 +287,20 @@ const UserSignup = () => {
               </label>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-cyan-400 hover:bg-cyan-500 text-gray-900 font-semibold py-3 px-4 rounded-lg transition-colors"
+              disabled={isLoading}
+              className="w-full bg-cyan-400 hover:bg-cyan-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-semibold py-3 px-4 rounded-lg transition-colors"
             >
-              Create Account
+              {isLoading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 

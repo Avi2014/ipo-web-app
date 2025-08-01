@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const UserSignin = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,11 @@ const UserSignin = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -17,12 +23,32 @@ const UserSignin = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    // Clear error when user starts typing
+    if (error) setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("User signin:", formData);
-    // Handle user signin logic here - redirect to dashboard
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const result = await login(formData.email, formData.password);
+
+      // Check if user is regular user (not admin)
+      if (result.user.role === "admin") {
+        setError("Admin users should use admin login portal");
+        setIsLoading(false);
+        return;
+      }
+
+      // Redirect to user dashboard
+      navigate("/trading-dashboard");
+    } catch (error) {
+      console.error("Login error:", error);
+      setError(error.message || "Invalid credentials. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   const handleSocialLogin = (provider) => {
@@ -240,12 +266,20 @@ const UserSignin = () => {
               </Link>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-cyan-400 hover:bg-cyan-500 text-gray-900 font-semibold py-3 px-4 rounded-lg transition-colors"
+              disabled={isLoading}
+              className="w-full bg-cyan-400 hover:bg-cyan-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-semibold py-3 px-4 rounded-lg transition-colors"
             >
-              Sign In
+              {isLoading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 

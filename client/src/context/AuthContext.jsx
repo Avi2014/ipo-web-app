@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, useEffect } from "react";
+import authService from "../services/authService.js";
 
 // Create the AuthContext
 export const AuthContext = createContext();
@@ -98,25 +99,39 @@ export const AuthProvider = ({ children }) => {
 
   // Check for existing token on app start
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userData = localStorage.getItem("userData");
-
-    if (token && userData) {
+    const initializeAuth = async () => {
       try {
-        const user = JSON.parse(userData);
-        dispatch({
-          type: "LOGIN_SUCCESS",
-          payload: { user, token },
-        });
+        if (authService.isAuthenticated()) {
+          const user = authService.getStoredUser();
+          const token = authService.getStoredToken();
+
+          if (user && token) {
+            // Verify token is still valid by getting current user
+            try {
+              const currentUser = await authService.getCurrentUser();
+              dispatch({
+                type: "LOGIN_SUCCESS",
+                payload: { user: currentUser, token },
+              });
+            } catch (error) {
+              // Token is invalid, clear it
+              console.error("Token validation failed:", error);
+              authService.logout();
+              dispatch({ type: "SET_LOADING", payload: false });
+            }
+          } else {
+            dispatch({ type: "SET_LOADING", payload: false });
+          }
+        } else {
+          dispatch({ type: "SET_LOADING", payload: false });
+        }
       } catch (error) {
-        console.error("Error parsing user data:", error);
-        localStorage.removeItem("token");
-        localStorage.removeItem("userData");
+        console.error("Auth initialization error:", error);
         dispatch({ type: "SET_LOADING", payload: false });
       }
-    } else {
-      dispatch({ type: "SET_LOADING", payload: false });
-    }
+    };
+
+    initializeAuth();
   }, []);
 
   // Login function
@@ -124,93 +139,74 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: "LOGIN_START" });
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await authService.login(email, password);
 
-      // Mock successful login
-      const userData = {
-        id: Date.now(),
-        email,
-        name: userType === "admin" ? "Admin User" : "Regular User",
-        role: userType,
-        avatar: `https://ui-avatars.com/api/?name=${email}&background=3B82F6&color=fff`,
-      };
-
-      const token = "mock-jwt-token-" + Date.now();
-
-      // Store in localStorage
-      localStorage.setItem("token", token);
-      localStorage.setItem("userData", JSON.stringify(userData));
+      // Check if user has the required role for admin login
+      if (userType === "admin" && result.user.role !== "admin") {
+        throw {
+          message: "Access denied. Admin privileges required.",
+          code: "INSUFFICIENT_PERMISSIONS",
+        };
+      }
 
       dispatch({
         type: "LOGIN_SUCCESS",
-        payload: { user: userData, token },
+        payload: { user: result.user, token: result.token },
       });
 
-      return { success: true, user: userData, token };
+      return { success: true, user: result.user, token: result.token };
     } catch (error) {
+      const errorMessage = error.message || "Login failed";
       dispatch({
         type: "LOGIN_FAILURE",
-        payload: error.message || "Login failed",
+        payload: errorMessage,
       });
       throw error;
     }
-  };
-
-  // Register function
+  }; // Register function
   const register = async (userData) => {
     dispatch({ type: "REGISTER_START" });
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock successful registration
-      const user = {
-        id: Date.now(),
-        email: userData.email,
-        name: userData.name,
-        phone: userData.phone,
-        organization: userData.organization,
-        role: userData.role || "user",
-        avatar: `https://ui-avatars.com/api/?name=${userData.name}&background=3B82F6&color=fff`,
-        kycStatus: "pending",
-        profileCompleted: false,
-      };
-
-      const token = "mock-jwt-token-" + Date.now();
-
-      // Store in localStorage
-      localStorage.setItem("token", token);
-      localStorage.setItem("userData", JSON.stringify(user));
+      const result = await authService.register(userData);
 
       dispatch({
         type: "REGISTER_SUCCESS",
-        payload: { user, token },
+        payload: { user: result.user, token: result.token },
       });
 
-      return { success: true, user, token };
+      return { success: true, user: result.user, token: result.token };
     } catch (error) {
+      const errorMessage = error.message || "Registration failed";
       dispatch({
         type: "REGISTER_FAILURE",
-        payload: error.message || "Registration failed",
+        payload: errorMessage,
       });
       throw error;
     }
   };
 
   // Logout function
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userData");
-    dispatch({ type: "LOGOUT" });
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      dispatch({ type: "LOGOUT" });
+    }
   };
 
   // Update profile function
-  const updateProfile = (updatedData) => {
-    const updatedUser = { ...state.user, ...updatedData };
-    localStorage.setItem("userData", JSON.stringify(updatedUser));
-    dispatch({ type: "UPDATE_PROFILE", payload: updatedUser });
+  const updateProfile = async (updatedData) => {
+    try {
+      const updatedUser = await authService.updateProfile(updatedData);
+      dispatch({ type: "UPDATE_PROFILE", payload: updatedUser });
+      return updatedUser;
+    } catch (error) {
+      console.error("Update profile error:", error);
+      throw error;
+    }
   };
 
   // Clear error function
@@ -220,7 +216,7 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user has completed KYC
   const isKYCCompleted = () => {
-    return state.user?.kycStatus === "completed";
+    return authService.isKYCVerified();
   };
 
   // Check if user profile is completed
@@ -236,7 +232,40 @@ export const AuthProvider = ({ children }) => {
   // Update KYC status
   const updateKYCStatus = (status) => {
     const updatedUser = { ...state.user, kycStatus: status };
-    updateProfile(updatedUser);
+    dispatch({ type: "UPDATE_PROFILE", payload: updatedUser });
+  };
+
+  // Change password
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      await authService.changePassword(currentPassword, newPassword);
+      return { success: true };
+    } catch (error) {
+      console.error("Change password error:", error);
+      throw error;
+    }
+  };
+
+  // Forgot password
+  const forgotPassword = async (email) => {
+    try {
+      await authService.forgotPassword(email);
+      return { success: true };
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      throw error;
+    }
+  };
+
+  // Reset password
+  const resetPassword = async (token, newPassword) => {
+    try {
+      await authService.resetPassword(token, newPassword);
+      return { success: true };
+    } catch (error) {
+      console.error("Reset password error:", error);
+      throw error;
+    }
   };
 
   // Context value
@@ -254,6 +283,9 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     clearError,
+    changePassword,
+    forgotPassword,
+    resetPassword,
 
     // Utility functions
     isKYCCompleted,

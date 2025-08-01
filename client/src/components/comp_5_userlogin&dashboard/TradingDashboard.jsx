@@ -13,6 +13,8 @@ import {
   ChevronDown,
   Activity,
 } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const TradingDashboard = () => {
   const [selectedStock, setSelectedStock] = useState("MSFT");
@@ -22,6 +24,27 @@ const TradingDashboard = () => {
   const [timeInForce, setTimeInForce] = useState("Day");
   const [portfolioBalance] = useState("$623,098.17");
   const [availableFunds] = useState("$122,912.50");
+
+  const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if not authenticated or if admin
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/user-signin");
+    } else if (user && user.role === "admin") {
+      navigate("/admin/dashboard");
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/user-signin");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   // Mock stock data
   const stockData = {
@@ -67,8 +90,12 @@ const TradingDashboard = () => {
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gray-600 rounded-full"></div>
               <div>
-                <div className="text-sm font-medium">Pratik Patil</div>
-                <div className="text-xs text-gray-400">Account: 4453728992</div>
+                <div className="text-sm font-medium">
+                  {user?.name || "User"}
+                </div>
+                <div className="text-xs text-gray-400">
+                  Account: {user?.id || "N/A"}
+                </div>
               </div>
             </div>
 
@@ -103,26 +130,38 @@ const TradingDashboard = () => {
       <div className="flex">
         {/* Left Sidebar */}
         <div className="w-16 bg-gray-800 border-r border-gray-700 flex flex-col items-center py-4 space-y-6">
-          <div className="p-2 bg-blue-600 rounded-lg">
+          <Link to="/trading-dashboard" className="p-2 bg-blue-600 rounded-lg">
             <BarChart3 className="w-6 h-6" />
-          </div>
-          <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+          </Link>
+          <Link
+            to="/market-overview"
+            className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer"
+          >
             <TrendingUp className="w-6 h-6 text-gray-400" />
-          </div>
+          </Link>
           <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
             <Activity className="w-6 h-6 text-gray-400" />
           </div>
           <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
             <Eye className="w-6 h-6 text-gray-400" />
           </div>
-          <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+          <Link
+            to="/account-settings"
+            className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer"
+          >
             <User className="w-6 h-6 text-gray-400" />
-          </div>
+          </Link>
           <div className="mt-auto space-y-4">
-            <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+            <Link
+              to="/account-settings"
+              className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer"
+            >
               <Settings className="w-6 h-6 text-gray-400" />
-            </div>
-            <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+            </Link>
+            <div
+              className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer"
+              onClick={handleLogout}
+            >
               <LogOut className="w-6 h-6 text-gray-400" />
             </div>
           </div>

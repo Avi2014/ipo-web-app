@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import {
   AuthContainer,
@@ -7,10 +7,15 @@ import {
   RegisterIPODetails,
 } from "../comp_2_admin_side";
 
-const AdminRoutes = () => {
+const AdminRoutes = ({ initialPage = "dashboard" }) => {
   const { user, isAuthenticated } = useAuth();
-  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+
+  // Update currentPage when initialPage changes
+  useEffect(() => {
+    setCurrentPage(initialPage);
+  }, [initialPage]);
 
   // If user is not authenticated, show auth container
   if (!isAuthenticated || user?.role !== "admin") {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Bell,
   Search,
@@ -19,20 +19,43 @@ import {
   Edit,
   Camera,
 } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const AccountSettings = () => {
   const [portfolioBalance] = useState("$623,098.17");
   const [availableFunds] = useState("$122,912.50");
   const [activeTab, setActiveTab] = useState("Account");
 
+  const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if not authenticated or if admin
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/user-signin");
+    } else if (user && user.role === "admin") {
+      navigate("/admin/dashboard");
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/user-signin");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   const [userProfile, setUserProfile] = useState({
-    firstName: "Pratik",
-    lastName: "Patil",
-    dateOfBirth: "December 17, 1990",
-    email: "pratikpatil@hotmail.com",
+    firstName: user?.name?.split(" ")[0] || "User",
+    lastName: user?.name?.split(" ")[1] || "",
+    dateOfBirth: "Not specified",
+    email: user?.email || "",
     phoneNumber: "(123) 456-7890",
-    username: "WitttradeberLain",
-    accountNumber: "4453728992",
+    username: user?.name || "User",
+    accountNumber: user?.id || "N/A",
     country: "India",
     cityState: "Pune, MH",
     streetAddress: "4517 Kothrud",
@@ -99,8 +122,12 @@ const AccountSettings = () => {
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gray-600 rounded-full"></div>
               <div>
-                <div className="text-sm font-medium">James Raymond</div>
-                <div className="text-xs text-gray-400">Account: 4453728992</div>
+                <div className="text-sm font-medium">
+                  {user?.name || "User"}
+                </div>
+                <div className="text-xs text-gray-400">
+                  Account: {user?.id || "N/A"}
+                </div>
               </div>
             </div>
 
@@ -135,26 +162,38 @@ const AccountSettings = () => {
       <div className="flex">
         {/* Left Sidebar */}
         <div className="w-16 bg-gray-800 border-r border-gray-700 flex flex-col items-center py-4 space-y-6">
-          <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+          <Link
+            to="/trading-dashboard"
+            className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer"
+          >
             <BarChart3 className="w-6 h-6 text-gray-400" />
-          </div>
-          <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+          </Link>
+          <Link
+            to="/market-overview"
+            className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer"
+          >
             <Globe className="w-6 h-6 text-gray-400" />
-          </div>
+          </Link>
           <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
             <Activity className="w-6 h-6 text-gray-400" />
           </div>
           <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
             <Eye className="w-6 h-6 text-gray-400" />
           </div>
-          <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+          <Link
+            to="/account-settings"
+            className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer"
+          >
             <User className="w-6 h-6 text-gray-400" />
-          </div>
+          </Link>
           <div className="mt-auto space-y-4">
             <div className="p-2 bg-cyan-600 rounded-lg">
               <Settings className="w-6 h-6" />
             </div>
-            <div className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+            <div
+              className="p-2 hover:bg-gray-700 rounded-lg cursor-pointer"
+              onClick={handleLogout}
+            >
               <LogOut className="w-6 h-6 text-gray-400" />
             </div>
           </div>

@@ -26,13 +26,39 @@ const SignIn = () => {
     setIsLoading(true);
     setError("");
 
+    // Basic validation
+    if (!formData.email || !formData.password) {
+      setError("Please fill in all fields.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await login(formData.email, formData.password, "admin");
       // Redirect to admin dashboard after successful login
-      navigate("/admin");
+      navigate("/admin/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
-      setError("Invalid email or password. Please try again.");
+
+      // Handle specific error messages
+      let errorMessage = "Invalid email or password. Please try again.";
+
+      if (error.code === "INSUFFICIENT_PERMISSIONS") {
+        errorMessage = "Access denied. Admin privileges required.";
+      } else if (error.code === "USER_NOT_FOUND") {
+        errorMessage = "No account found with this email address.";
+      } else if (error.code === "INVALID_CREDENTIALS") {
+        errorMessage = "Invalid email or password.";
+      } else if (error.code === "ACCOUNT_DEACTIVATED") {
+        errorMessage =
+          "Your account has been deactivated. Please contact support.";
+      } else if (error.code === "NETWORK_ERROR") {
+        errorMessage = "Network error. Please check your internet connection.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -131,12 +157,13 @@ const SignIn = () => {
               />
               <span className="ml-2 text-sm text-gray-600">Remember me</span>
             </label>
-            <Link
-              to="/forgot-password"
+            <button
+              type="button"
+              onClick={() => navigate("/admin/forgot-password")}
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
             >
               Forgot password?
-            </Link>
+            </button>
           </div>
 
           {/* Sign In Button */}
@@ -160,12 +187,12 @@ const SignIn = () => {
         <div className="mt-8 text-center">
           <p className="text-gray-600">
             Don't have an account?{" "}
-            <Link
-              to="/signup"
+            <button
+              onClick={() => navigate("/admin/auth")}
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
-              Sign up
-            </Link>
+              Contact Administrator
+            </button>
           </p>
         </div>
       </div>
