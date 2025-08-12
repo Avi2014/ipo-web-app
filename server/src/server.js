@@ -99,7 +99,8 @@ app.get('/api', (req, res) => {
       auth: '/api/auth',
       ipos: '/api/ipos',
       users: '/api/users',
-      applications: '/api/applications'
+      applications: '/api/applications',
+      market: '/api/market'
     },
     documentation: 'API documentation available at /api/docs'
   });

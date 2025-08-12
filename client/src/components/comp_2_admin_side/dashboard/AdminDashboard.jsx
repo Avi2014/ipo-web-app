@@ -64,7 +64,7 @@ const AdminDashboard = () => {
           }));
           // ...existing code...
         })
-        .catch((err) => {
+        .catch(() => {
           // Error handling can be added here if needed
         });
     });

@@ -8,7 +8,6 @@ const UserDashboardHeader = ({
   availableFunds = "$122,912.50",
 }) => {
   const { user } = useAuth();
-
   return (
     <div className="bg-gray-800 border-b border-gray-700">
       <div className="flex items-center justify-between px-6 py-3">

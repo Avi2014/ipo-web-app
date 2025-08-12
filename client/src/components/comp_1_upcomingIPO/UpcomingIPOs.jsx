@@ -20,7 +20,8 @@ const UpcomingIPOs = () => {
       api
         .get("/ipos/upcoming")
         .then((res) => {
-          setIPOs(res.data.data || []);
+          const iposData = res.data.data;
+          setIPOs(Array.isArray(iposData) ? iposData : []);
         })
         .catch(() => {
           setIPOs([]);

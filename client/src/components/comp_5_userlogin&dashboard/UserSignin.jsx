@@ -98,29 +98,7 @@ const UserSignin = () => {
 
         {/* Testimonial */}
         <div className="relative z-10">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-            <div className="flex items-center mb-4">
-              <div className="w-3 h-3 bg-cyan-400 rounded-full mr-2"></div>
-              <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
-            </div>
-            <p className="text-white/90 mb-4">
-              The platform transformed my trading experience with{" "}
-              <span className="font-semibold text-white">
-                powerful insights
-              </span>{" "}
-              and{" "}
-              <span className="font-semibold text-white">
-                seamless execution
-              </span>
-            </p>
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-white/20 rounded-full mr-3"></div>
-              <div>
-                <div className="font-semibold text-white">Sarah Chen</div>
-                <div className="text-cyan-400 text-sm">Premium Trader</div>
-              </div>
-            </div>
-          </div>
+          
         </div>
       </div>
 
