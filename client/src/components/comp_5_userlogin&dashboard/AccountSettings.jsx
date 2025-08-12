@@ -21,12 +21,12 @@ import {
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import api from "../../services/api";
 
 const AccountSettings = () => {
-  const [portfolioBalance] = useState("$623,098.17");
-  const [availableFunds] = useState("$122,912.50");
+  const [portfolioBalance, setPortfolioBalance] = useState(0);
+  const [availableFunds, setAvailableFunds] = useState(0);
   const [activeTab, setActiveTab] = useState("Account");
-
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -39,6 +39,24 @@ const AccountSettings = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
+  // Fetch user profile and portfolio info from backend
+  const [userProfile, setUserProfile] = useState(null);
+  const [isEditing, setIsEditing] = useState({
+    personal: false,
+    address: false,
+    employer: false,
+  });
+
+  useEffect(() => {
+    api.get("/users/profile").then((res) => {
+      setUserProfile(res.data.data);
+    });
+    api.get("/users/portfolio").then((res) => {
+      setPortfolioBalance(res.data.data?.balance || 0);
+      setAvailableFunds(res.data.data?.availableFunds || 0);
+    });
+  }, []);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -48,26 +66,29 @@ const AccountSettings = () => {
     }
   };
 
-  const [userProfile, setUserProfile] = useState({
-    firstName: user?.name?.split(" ")[0] || "User",
-    lastName: user?.name?.split(" ")[1] || "",
-    dateOfBirth: "Not specified",
-    email: user?.email || "",
-    phoneNumber: "(123) 456-7890",
-    username: user?.name || "User",
-    accountNumber: user?.id || "N/A",
-    country: "India",
-    cityState: "Pune, MH",
-    streetAddress: "4517 Kothrud",
-    companyName: "Designer Inc.",
-    companyCityState: "Chicago, Illinois",
-  });
+  const handleEdit = (section) => {
+    setIsEditing((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
 
-  const [isEditing, setIsEditing] = useState({
-    personal: false,
-    address: false,
-    employer: false,
-  });
+  const handleSave = (section) => {
+    // Save logic: send updated profile section to backend
+    api.put("/users/profile", userProfile).then(() => {
+      setIsEditing((prev) => ({
+        ...prev,
+        [section]: false,
+      }));
+    });
+  };
+
+  const handleInputChange = (field, value) => {
+    setUserProfile((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const sidebarItems = [
     { id: "Account", icon: User, label: "Account", active: true },
@@ -83,28 +104,6 @@ const AccountSettings = () => {
     { id: "Beneficiaries", icon: User, label: "Beneficiaries" },
     { id: "Rewards", icon: Gift, label: "Rewards" },
   ];
-
-  const handleEdit = (section) => {
-    setIsEditing((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
-
-  const handleSave = (section) => {
-    // Save logic here
-    setIsEditing((prev) => ({
-      ...prev,
-      [section]: false,
-    }));
-  };
-
-  const handleInputChange = (field, value) => {
-    setUserProfile((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -228,7 +227,7 @@ const AccountSettings = () => {
 
           {/* Main Content */}
           <div className="flex-1 p-8">
-            {activeTab === "Account" && (
+            {activeTab === "Account" && userProfile && (
               <div>
                 <div className="flex items-center justify-between mb-8">
                   <div>

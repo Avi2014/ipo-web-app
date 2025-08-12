@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import api from "../../services/api";
 
 const TradingDashboard = () => {
   const [selectedStock, setSelectedStock] = useState("MSFT");
@@ -22,8 +23,11 @@ const TradingDashboard = () => {
   const [quantity, setQuantity] = useState(100);
   const [stopPrice, setStopPrice] = useState(400.0);
   const [timeInForce, setTimeInForce] = useState("Day");
-  const [portfolioBalance] = useState("$623,098.17");
-  const [availableFunds] = useState("$122,912.50");
+  const [portfolioBalance, setPortfolioBalance] = useState(0);
+  const [availableFunds, setAvailableFunds] = useState(0);
+  const [stockData, setStockData] = useState(null);
+  const [recentTrades, setRecentTrades] = useState([]);
+  const quickQuantities = [10, 50, 100, 500];
 
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -37,6 +41,22 @@ const TradingDashboard = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
+  useEffect(() => {
+    // Fetch portfolio and funds
+    api.get("/users/portfolio").then((res) => {
+      setPortfolioBalance(res.data.data?.balance || 0);
+      setAvailableFunds(res.data.data?.availableFunds || 0);
+    });
+    // Fetch selected stock data
+    api.get(`/market/stock/${selectedStock}`).then((res) => {
+      setStockData(res.data.data);
+    });
+    // Fetch recent trades
+    api.get(`/market/stock/${selectedStock}/trades`).then((res) => {
+      setRecentTrades(res.data.data || []);
+    });
+  }, [selectedStock]);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -45,34 +65,6 @@ const TradingDashboard = () => {
       console.error("Logout error:", error);
     }
   };
-
-  // Mock stock data
-  const stockData = {
-    symbol: "MSFT",
-    name: "Microsoft Corp NASDAQ",
-    price: 406.32,
-    change: 2.24,
-    changePercent: 0.56,
-    open: 409.14,
-    high: 408.36,
-    low: 408.36,
-    close: 408.36,
-    volume: "56,254,781",
-    avgVol: "21.73M",
-    sharesOutstanding: "7.46B",
-    marketCap: "3.02T",
-    divYield: "0.74%",
-  };
-
-  const recentTrades = [
-    { time: "16:59:32", price: 420.56, quantity: 25 },
-    { time: "16:59:32", price: 420.56, quantity: 25 },
-    { time: "16:59:32", price: 420.56, quantity: 25 },
-    { time: "16:59:32", price: 420.56, quantity: 25 },
-    { time: "16:59:32", price: 420.56, quantity: 25 },
-  ];
-
-  const quickQuantities = [10, 50, 100, 500];
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -174,8 +166,8 @@ const TradingDashboard = () => {
             {/* Stock Header */}
             <div className="mb-6">
               <div className="flex items-center gap-4 mb-4">
-                <h1 className="text-2xl font-bold">{stockData.symbol}</h1>
-                <span className="text-gray-400">{stockData.name}</span>
+                <h1 className="text-2xl font-bold">{stockData?.symbol}</h1>
+                <span className="text-gray-400">{stockData?.name}</span>
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4" />
                   <Bell className="w-4 h-4" />
@@ -185,9 +177,9 @@ const TradingDashboard = () => {
               <div className="flex items-center gap-8">
                 <div>
                   <div className="text-4xl font-bold text-green-400">
-                    {stockData.price}
+                    {stockData?.price}
                     <span className="text-lg ml-2 text-green-400">
-                      +{stockData.change} +{stockData.changePercent}%
+                      +{stockData?.change} +{stockData?.changePercent}%
                     </span>
                   </div>
                   <div className="text-sm text-gray-400">
@@ -200,27 +192,27 @@ const TradingDashboard = () => {
               <div className="grid grid-cols-6 gap-4 mt-4 text-sm">
                 <div>
                   <div className="text-gray-400">Open</div>
-                  <div className="text-red-400">{stockData.open}</div>
+                  <div className="text-red-400">{stockData?.open}</div>
                 </div>
                 <div>
                   <div className="text-gray-400">High</div>
-                  <div>{stockData.high}</div>
+                  <div>{stockData?.high}</div>
                 </div>
                 <div>
                   <div className="text-gray-400">Low</div>
-                  <div>{stockData.low}</div>
+                  <div>{stockData?.low}</div>
                 </div>
                 <div>
                   <div className="text-gray-400">Avg Vol (3M)</div>
-                  <div>{stockData.avgVol}</div>
+                  <div>{stockData?.avgVol}</div>
                 </div>
                 <div>
                   <div className="text-gray-400">Shares Outstanding</div>
-                  <div>{stockData.sharesOutstanding}</div>
+                  <div>{stockData?.sharesOutstanding}</div>
                 </div>
                 <div>
                   <div className="text-gray-400">Mkt Cap</div>
-                  <div>{stockData.marketCap}</div>
+                  <div>{stockData?.marketCap}</div>
                 </div>
               </div>
             </div>
@@ -233,20 +225,20 @@ const TradingDashboard = () => {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
                   <span className="text-sm text-gray-400">
-                    Open {stockData.open}
+                    Open {stockData?.open}
                   </span>
                   <span className="text-sm text-gray-400">
-                    High {stockData.high}
+                    High {stockData?.high}
                   </span>
                   <span className="text-sm text-gray-400">
-                    Low {stockData.low}
+                    Low {stockData?.low}
                   </span>
                   <span className="text-sm text-gray-400">
-                    Close {stockData.close}
+                    Close {stockData?.close}
                   </span>
                   <span className="text-sm text-green-400">+8.90 +2.14%</span>
                   <span className="text-sm text-gray-400">
-                    Vol {stockData.volume}
+                    Vol {stockData?.volume}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">

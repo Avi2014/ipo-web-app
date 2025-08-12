@@ -1,11 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { TrendingUp, Calendar, Filter } from "lucide-react";
 import IPOCard from "./IPOCard";
 import SearchAndFilters from "./SearchAndFilters";
 import IPODetailsModal from "./IPODetailsModal";
-import { upcomingIPOs } from "./data/ipoData";
 
-const   UpcomingIPOs = () => {
+const UpcomingIPOs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     sector: "All Sectors",
@@ -14,10 +13,24 @@ const   UpcomingIPOs = () => {
   });
   const [selectedIPO, setSelectedIPO] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [ipos, setIPOs] = useState([]);
+
+  useEffect(() => {
+    import("../../services/api").then(({ default: api }) => {
+      api
+        .get("/ipos/upcoming")
+        .then((res) => {
+          setIPOs(res.data.data || []);
+        })
+        .catch(() => {
+          setIPOs([]);
+        });
+    });
+  }, []);
 
   // Filter and search logic
   const filteredIPOs = useMemo(() => {
-    return upcomingIPOs.filter((ipo) => {
+    return ipos.filter((ipo) => {
       // Search filter
       const matchesSearch = ipo.companyName
         .toLowerCase()
@@ -37,7 +50,7 @@ const   UpcomingIPOs = () => {
 
       return matchesSearch && matchesSector && matchesStatus && matchesType;
     });
-  }, [searchTerm, filters]);
+  }, [searchTerm, filters, ipos]);
 
   const handleViewDetails = (ipo) => {
     setSelectedIPO(ipo);
@@ -58,7 +71,7 @@ const   UpcomingIPOs = () => {
   };
 
   const getStatusCounts = () => {
-    const counts = upcomingIPOs.reduce((acc, ipo) => {
+    const counts = ipos.reduce((acc, ipo) => {
       acc[ipo.status] = (acc[ipo.status] || 0) + 1;
       return acc;
     }, {});

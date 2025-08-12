@@ -14,9 +14,11 @@ import authRoutes from './routes/auth.js';
 import ipoRoutes from './routes/ipos.js';
 import userRoutes from './routes/users.js';
 import applicationRoutes from './routes/applications.js';
+import marketRoutes from './routes/market.js';
 
 // Load environment variables
 dotenv.config();
+console.log('DEBUG MONGODB_URI:', process.env.MONGODB_URI);
 
 // Connect to MongoDB
 connectDB();
@@ -108,6 +110,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/ipos', ipoRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/market', marketRoutes);
 
 // 404 handler for API routes
 app.use('/api/*', notFound);

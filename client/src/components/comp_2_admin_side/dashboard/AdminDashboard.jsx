@@ -21,102 +21,68 @@ const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [notifications, setNotifications] = useState([]);
-
-  // Mock data for dashboard
-  const [dashboardStats] = useState({
-    totalIPOs: 24,
-    activeIPOs: 8,
-    totalInvestors: 15420,
-    totalInvestment: 2450000000,
-    recentApplications: 342,
-    pendingApprovals: 12,
+  const [dashboardStats, setDashboardStats] = useState({
+    totalIPOs: 0,
+    activeIPOs: 0,
+    totalInvestors: 0,
+    totalInvestment: 0,
+    recentApplications: 0,
+    pendingApprovals: 0,
   });
-
-  const [recentIPOs] = useState([
-    {
-      id: 1,
-      companyName: "Tech Solutions Ltd",
-      symbol: "TECH",
-      price: "₹450",
-      size: "₹2,500 Cr",
-      status: "Active",
-      openDate: "2025-07-20",
-      closeDate: "2025-07-25",
-      applications: 1250,
-      subscriptionRatio: "2.5x",
-    },
-    {
-      id: 2,
-      companyName: "Green Energy Corp",
-      symbol: "GREEN",
-      price: "₹320",
-      size: "₹1,800 Cr",
-      status: "Upcoming",
-      openDate: "2025-07-28",
-      closeDate: "2025-08-02",
-      applications: 0,
-      subscriptionRatio: "-",
-    },
-    {
-      id: 3,
-      companyName: "FinTech Innovations",
-      symbol: "FINTECH",
-      price: "₹680",
-      size: "₹3,200 Cr",
-      status: "Closed",
-      openDate: "2025-07-10",
-      closeDate: "2025-07-15",
-      applications: 2100,
-      subscriptionRatio: "4.2x",
-    },
-  ]);
-
-  const [recentApplications] = useState([
-    {
-      id: 1,
-      investorName: "John Doe",
-      email: "john@example.com",
-      ipoName: "Tech Solutions Ltd",
-      amount: "₹50,000",
-      status: "Pending",
-      appliedDate: "2025-07-17",
-    },
-    {
-      id: 2,
-      investorName: "Sarah Wilson",
-      email: "sarah@example.com",
-      ipoName: "Tech Solutions Ltd",
-      amount: "₹75,000",
-      status: "Approved",
-      appliedDate: "2025-07-17",
-    },
-    {
-      id: 3,
-      investorName: "Mike Johnson",
-      email: "mike@example.com",
-      ipoName: "Green Energy Corp",
-      amount: "₹100,000",
-      status: "Rejected",
-      appliedDate: "2025-07-16",
-    },
-  ]);
+  const [recentIPOs, setRecentIPOs] = useState([]);
+  const [recentApplications, setRecentApplications] = useState([]);
+  // ...existing code...
 
   useEffect(() => {
-    // Mock notifications
+    // ...existing code...
+    import("../../../services/api").then(({ default: api }) => {
+      Promise.all([
+        api.get("/ipos"),
+        api.get("/applications/admin/all"),
+        api.get("/users/stats"),
+      ])
+        .then(([iposRes, appsRes, usersRes]) => {
+          const ipos = iposRes.data.data || [];
+          setRecentIPOs(ipos.slice(0, 5));
+          setDashboardStats((prev) => ({
+            ...prev,
+            totalIPOs: ipos.length,
+            activeIPOs: ipos.filter((ipo) => ipo.status === "Active").length,
+          }));
+          const applications = appsRes.data.data || [];
+          setRecentApplications(applications.slice(0, 5));
+          setDashboardStats((prev) => ({
+            ...prev,
+            recentApplications: applications.length,
+            pendingApprovals: applications.filter((a) => a.status === "Pending")
+              .length,
+          }));
+          setDashboardStats((prev) => ({
+            ...prev,
+            totalInvestors: usersRes.data.data?.totalUsers || 0,
+            totalInvestment: usersRes.data.data?.totalInvestment || 0,
+          }));
+          // ...existing code...
+        })
+        .catch((err) => {
+          // Error handling can be added here if needed
+        });
+    });
+    // Example notifications
     setNotifications([
       {
         id: 1,
-        message: "New IPO application from Tech Solutions Ltd",
+        message: "New IPO application received",
         time: "2 hours ago",
       },
       {
         id: 2,
-        message: "15 new investor registrations today",
+        message: "Investor registrations today",
         time: "4 hours ago",
       },
       {
         id: 3,
-        message: "Green Energy Corp IPO oversubscribed by 2.5x",
+        message: "IPO oversubscribed",
         time: "1 day ago",
       },
     ]);
