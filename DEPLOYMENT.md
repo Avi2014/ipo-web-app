@@ -1,104 +1,104 @@
 # Deployment Guide for IPO Web App
 
-This guide will help you deploy your IPO Web App to Vercel.
+This guide will help you deploy your IPO Web App to Vercel with separate frontend and backend deployments.
 
 ## Prerequisites
 
 1. **Vercel Account**: Sign up at [vercel.com](https://vercel.com)
 2. **MongoDB Atlas**: Set up a MongoDB Atlas cluster for production
-3. **GitHub Repository**: Push your code to GitHub
+3. **GitHub Repository**: Push your code to GitHub (or deploy directly)
+
+## Deployment Architecture
+
+This app uses **separate deployments**:
+- **Frontend**: React app deployed as static site
+- **Backend**: Node.js API deployed as serverless functions
 
 ## Environment Variables Setup
 
-1. **MongoDB Atlas**:
-   - Create a new cluster on MongoDB Atlas
-   - Get your connection string
-   - Whitelist Vercel's IP addresses (or use 0.0.0.0/0 for all IPs)
+### Backend Environment Variables:
+Set these in your **server** Vercel project:
 
-2. **Environment Variables for Vercel**:
-   Go to your Vercel project settings and add these environment variables:
+```
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/ipoapp?retryWrites=true&w=majority
+JWT_SECRET=your_super_secure_jwt_secret_minimum_32_characters_long
+JWT_EXPIRE=7d
+NODE_ENV=production
+CORS_ORIGIN=https://your-frontend-domain.vercel.app
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+MAX_FILE_SIZE=10mb
+```
 
-   ```
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/ipoapp?retryWrites=true&w=majority
-   JWT_SECRET=your_super_secure_jwt_secret_minimum_32_characters_long
-   JWT_EXPIRE=7d
-   NODE_ENV=production
-   CORS_ORIGIN=https://your-project-name.vercel.app
-   RATE_LIMIT_WINDOW_MS=900000
-   RATE_LIMIT_MAX_REQUESTS=100
-   MAX_FILE_SIZE=10mb
-   ```
+### Frontend Environment Variables:
+Set these in your **client** Vercel project:
+
+```
+VITE_API_URL=https://your-backend-domain.vercel.app
+```
 
 ## Deployment Steps
 
-### Option 1: Vercel CLI (Recommended)
+### Step 1: Deploy Backend (Server)
 
-1. **Install Vercel CLI**:
+1. **Navigate to server folder**:
    ```bash
-   npm i -g vercel
+   cd server
    ```
 
-2. **Login to Vercel**:
-   ```bash
-   vercel login
-   ```
-
-3. **Deploy from project root**:
+2. **Deploy to Vercel**:
    ```bash
    vercel
    ```
+   
+3. **Configure settings**:
+   - Project name: `ipo-api` (or similar)
+   - Add environment variables listed above
+   - Note the deployed URL (e.g., `https://ipo-api.vercel.app`)
 
-4. **Follow the prompts**:
-   - Link to existing project or create new one
-   - Choose your settings
-   - Deploy!
+### Step 2: Deploy Frontend (Client)
 
-### Option 2: GitHub Integration
-
-1. **Push to GitHub**:
+1. **Navigate to client folder**:
    ```bash
-   git add .
-   git commit -m "Ready for deployment"
-   git push origin main
+   cd ../client
    ```
 
-2. **Connect to Vercel**:
-   - Go to [vercel.com/dashboard](https://vercel.com/dashboard)
-   - Click "New Project"
-   - Import your GitHub repository
-   - Configure environment variables
-   - Deploy!
+2. **Update API URL**:
+   - Set `VITE_API_URL` environment variable to your backend URL
+   
+3. **Deploy to Vercel**:
+   ```bash
+   vercel
+   ```
+   
+4. **Configure settings**:
+   - Project name: `ipo-app` (or similar)
+   - Add environment variables listed above
 
-## Post-Deployment Configuration
+### Step 3: Update CORS Configuration
 
-1. **Update API Base URL**:
-   - Update your client API calls to use your Vercel domain
-   - Environment variable: `VITE_API_URL=https://your-project.vercel.app/api`
+1. **Update backend CORS_ORIGIN**:
+   - Go to your backend Vercel project settings
+   - Update `CORS_ORIGIN` to your frontend URL
 
-2. **Database Seeding**:
-   - Run your seed scripts after deployment
-   - Access your functions via Vercel dashboard
-
-3. **Domain Configuration**:
-   - Add custom domain if needed
-   - Update CORS_ORIGIN environment variable
-
-## File Structure for Deployment
+## File Structure for Separate Deployments
 
 ```
 ipo/
-├── vercel.json           # Vercel configuration
-├── .vercelignore        # Files to ignore during deployment
-├── .env.example         # Environment variables template
-├── client/              # React frontend
-│   ├── dist/           # Build output (generated)
+├── client/                 # Frontend deployment
+│   ├── vercel.json        # Frontend Vercel config
+│   ├── .vercelignore      # Frontend ignore file
+│   ├── dist/              # Build output
 │   ├── package.json
-│   └── vite.config.js
-├── server/              # Node.js backend
-│   ├── src/
-│   │   └── server.js   # Main server file
-│   └── package.json
-└── README.md
+│   └── src/
+├── server/                 # Backend deployment
+│   ├── vercel.json        # Backend Vercel config
+│   ├── .vercelignore      # Backend ignore file
+│   ├── package.json
+│   └── src/
+│       └── server.js
+├── .env.example
+└── DEPLOYMENT.md
 ```
 
 ## Troubleshooting
