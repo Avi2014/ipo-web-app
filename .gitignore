@@ -32,24 +32,24 @@ dist-ssr
 .env.test
 .env.production
 #json files
-*.json
-!*.jsonc
+# *.json
+# !*.jsonc
 #tailwind
-tailwind.config.js
-tailwind.config.cjs 
-tailwind.config.mjs
+# tailwind.config.js
+# tailwind.config.cjs 
+# tailwind.config.mjs
 #postcss
-postcss.config.js
-postcss.config.cjs
-postcss.config.mjs
+# postcss.config.js
+# postcss.config.cjs
+# postcss.config.mjs
 # vite
-vite.config.js
-vite.config.cjs
-vite.config.mjs
+# vite.config.js
+# vite.config.cjs
+# vite.config.mjs
 #es
-.eslintrc.js
-.eslintrc.cjs
-.eslintrc.mjs
+# .eslintrc.js
+# .eslintrc.cjs
+# .eslintrc.mjs
 
 .txt
 *.txt
